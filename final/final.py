@@ -66,14 +66,15 @@ class SemevalDataset(torch.utils.data.Dataset):
 argparser = argparse.ArgumentParser()
 argparser.add_argument("--base_model", default="bert-base-uncased", type=str, help="Base model to finetune")
 argparser.add_argument("--max_length", default=256, type=int, help="Max length of tokens")
-argparser.add_argument("--lr", default=2e-5, type=float, help="Max length of tokens")
+argparser.add_argument("--lr", default=5e-5, type=float, help="Max length of tokens")
+argparser.add_argument("--epochs", default=10, type=float, help="Number of training epochs")
 args = argparser.parse_args()
 
 LEARNING_RATE = args.lr
 BASE_MODEL = args.base_model
 MAX_LENGTH = args.max_length
+EPOCHS = args.epochs
 BATCH_SIZE = 32
-EPOCHS = 10
 
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 
@@ -88,8 +89,9 @@ test_dataset = SemevalDataset(test_encodings, y_test.values.tolist())
 model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=1)
 
 training_args = TrainingArguments(
-    output_dir=f"./models/{BASE_MODEL}-{MAX_LENGTH}-{LEARNING_RATE}",
+    output_dir=f"./models/{BASE_MODEL}-ml{MAX_LENGTH}-lr{LEARNING_RATE}-e{EPOCHS}",
     num_train_epochs=EPOCHS,
+    learning_rate=LEARNING_RATE,
     per_device_train_batch_size=BATCH_SIZE,
     per_device_eval_batch_size=BATCH_SIZE,
     evaluation_strategy="epoch",
